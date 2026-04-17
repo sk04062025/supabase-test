@@ -1,0 +1,52 @@
+## values-master.yaml
+
+# 1. Global Secrets (Used across all microservices)
+secret:
+  # Dummy JWT secret for testing (Must be at least 32 chars)
+  jwt: "super-secret-jwt-token-with-at-least-32-characters-master"
+  # Dummy Anon Key
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImF1ZCI6ImFub24iLCJleHAiOjE5OTk5OTk5OTl9.dummy-anon-key-signature"
+  # Dummy Service Role Key
+  serviceRoleKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImF1ZCI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk5OTk5OTk5OX0.dummy-service-role-key-signature"
+
+# 2. Supabase PostgreSQL Configuration
+# This fulfills the requirement to include the Postgres instance for testing
+db:
+  enabled: true
+  image:
+    repository: supabase/postgres
+    tag: 15.1.1.0-42
+  settings:
+    # Set the Master DB password
+    postgresPassword: "MasterSuperSecretPassword123"
+  # Expose Postgres outside the cluster so you can test FDW (Foreign Data Wrappers) later
+  service:
+    type: NodePort
+    port: 5432
+    nodePort: 30543
+
+# 3. Supabase Studio (The Dashboard)
+studio:
+  enabled: true
+  environment:
+    # URL for the API Gateway (Kong)
+    SUPABASE_URL: "http://localhost:8000"
+    # Required for Studio to connect to the DB directly
+    POSTGRES_PASSWORD: "MasterSuperSecretPassword123"
+
+# 4. Kong API Gateway (Your "Read-Write API Gateway" from the diagram)
+kong:
+  enabled: true
+  service:
+    # Exposing Kong to your local machine for API testing
+    type: NodePort
+    port: 8000
+    targetPort: 8000
+    nodePort: 30800
+
+# 5. Disable services not needed for a bare-minimum Master DB test (Optional)
+# If you only want to test Postgres + PostgREST API + Studio, you can disable these:
+storage:
+  enabled: true # Set to false if file storage is not needed in Master
+realtime:
+  enabled: true # Set to false if WebSocket streaming is not needed
