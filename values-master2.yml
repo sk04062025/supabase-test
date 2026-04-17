@@ -1,0 +1,49 @@
+## values-master.yaml
+
+# 1. Global Secrets (Properly nested as objects)
+secret:
+  jwt:
+    # The actual JWT string
+    secret: "super-secret-jwt-token-with-at-least-32-characters-master"
+    # The Anon Key
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImF1ZCI6ImFub24iLCJleHAiOjE5OTk5OTk5OTl9.dummy-anon-key-signature"
+    # The Service Role Key (Note: the chart expects 'serviceKey', not 'serviceRoleKey')
+    serviceKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImF1ZCI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk5OTk5OTk5OX0.dummy-service-role-key-signature"
+  
+  db:
+    # DB Credentials are now managed here
+    password: "MasterSuperSecretPassword123"
+    database: "postgres"
+
+# 2. Supabase PostgreSQL Configuration
+db:
+  enabled: true
+  image:
+    repository: supabase/postgres
+    tag: 15.1.1.0-42
+  service:
+    type: NodePort
+    port: 5432
+    nodePort: 30543
+
+# 3. Supabase Studio (The Dashboard)
+studio:
+  enabled: true
+  environment:
+    # URL for the API Gateway (Kong)
+    SUPABASE_URL: "http://localhost:8000"
+
+# 4. Kong API Gateway
+kong:
+  enabled: true
+  service:
+    type: NodePort
+    port: 8000
+    targetPort: 8000
+    nodePort: 30800
+
+# 5. Core Services
+storage:
+  enabled: true 
+realtime:
+  enabled: true
