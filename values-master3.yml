@@ -1,0 +1,33 @@
+## values-master.yaml
+
+secret:
+  jwt:
+    secret: "super-secret-jwt-token-with-at-least-32-characters-master"
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImF1ZCI6ImFub24iLCJleHAiOjE5OTk5OTk5OTl9.dummy-anon-key-signature"
+    serviceKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImF1ZCI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk5OTk5OTk5OX0.dummy-service-role-key-signature"
+  db:
+    password: "MasterSuperSecretPassword123"
+
+# 1. DISABLE built-in DB and point to the External HA Primary
+db:
+  enabled: false
+  host: "supabase-db-rw"  # The CloudNativePG Read/Write Service
+  port: 5432
+  user: "postgres"
+  database: "postgres"
+
+studio:
+  enabled: true
+  environment:
+    SUPABASE_URL: "http://localhost:8000"
+
+kong:
+  enabled: true
+  service:
+    type: NodePort
+    port: 8000
+    targetPort: 8000
+    nodePort: 30800
+
+functions:
+  enabled: false # Disabled to prevent firewall issues
