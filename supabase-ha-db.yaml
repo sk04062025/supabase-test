@@ -1,0 +1,37 @@
+# supabase-ha-db.yaml
+
+# 1. Define the Database Credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: supabase-db-credentials
+  namespace: supabase-master
+type: kubernetes.io/basic-auth
+stringData:
+  username: postgres
+  password: MasterSuperSecretPassword123
+
+---
+# 2. Define the HA Database Cluster
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: supabase-db
+  namespace: supabase-master
+spec:
+  # This creates 1 Primary and 2 Read Replicas
+  instances: 3 
+  imageName: supabase/postgres:15.1.1.0-42
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
+      secret:
+        name: supabase-db-credentials
+  postgresql:
+    parameters:
+      wal_level: logical          # Required for Supabase
+      max_replication_slots: "10" # Required for Realtime
