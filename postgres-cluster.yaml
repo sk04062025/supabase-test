@@ -1,0 +1,29 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: my-app-db
+spec:
+  # This creates 1 Primary + 2 Read-Only Replicas
+  instances: 3 
+
+  # Storage configuration
+  storage:
+    size: 20Gi
+    # storageClass: "standard" # Uncomment and set if you have a specific storage class
+
+  # Bootstrap: This creates the database and owner user automatically
+  bootstrap:
+    initdb:
+      database: myapp
+      owner: myuser
+      secret:
+        name: my-app-db-creds
+
+  # Optional: Resource requests/limits for stability
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
